@@ -1,0 +1,110 @@
+'use client'
+import { useEffect, useState } from "react";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import ImageCard from "../components/ImageCard";
+
+export default function GalleryPage() {
+  const [images, setImages] = useState<any[]>([]);
+  const [editingImage, setEditingImage] = useState<any | null>(null); 
+  const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+
+  const handleEdit = (image: any) => {
+    setEditingImage(image);
+    setNewTitle(image.title);
+    setNewDescription(image.description);
+  };
+
+  const handleSave = async () => {
+    if (!editingImage) return;
+
+    await updateDoc(doc(db, "gallery", editingImage.id), {
+      title: newTitle,
+      description: newDescription,
+    });
+
+    setImages((prevImages) =>
+      prevImages.map((img) =>
+        img.id === editingImage.id ? { ...img, title: newTitle, description: newDescription } : img
+      )
+    );
+
+    setEditingImage(null);
+    alert("Updated successfully!");
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this image?")) {
+      await deleteDoc(doc(db, "gallery", id));
+      setImages((prev) => prev.filter((img) => img.id !== id));
+    }
+  };
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const querySnapshot = await getDocs(collection(db, "gallery"));
+      const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setImages(data);
+    };
+    fetchImages();
+  }, []);
+
+  return (
+    <div className="max-w-5xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-6">Gallery</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {images.map((item) => (
+          <ImageCard
+            key={item.id}
+            image={item}
+            onEdit={() => handleEdit(item)}
+            onDelete={() => handleDelete(item.id)}
+          />
+        ))}
+      </div>
+
+      {editingImage && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4 text-black">Edit Image</h2>
+
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Title
+            </label>
+            <input
+              type="text"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              className="w-full border rounded p-2 mb-4 text-gray-800"
+            />
+
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Description
+            </label>
+            <textarea
+              value={newDescription}
+              onChange={(e) => setNewDescription(e.target.value)}
+              className="w-full border rounded p-2 mb-4 text-gray-800"
+            />
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setEditingImage(null)}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-black"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

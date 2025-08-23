@@ -27,11 +27,16 @@ export default function UploadForm() {
             );
 
             const imageUrl = res.data.secure_url;
+            const fileSizeInMB = (res.data.bytes / (1024 * 1024)).toFixed(2);
+            const uploadedDate = new Date(res.data.created_at).toLocaleString();
+
 
             await addDoc(collection(db, "gallery"), {
                 title,
                 description,
                 imageUrl,
+                fileSizeInMB,
+                uploadedDate,
                 createdAt: serverTimestamp(),
             });
 
