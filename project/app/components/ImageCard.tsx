@@ -69,7 +69,6 @@ export default function ImageCard({ image, onEdit, onDelete }: any) {
         )}
       </div>
 
-      {/* Dropdown Menu */}
       {showActions && (
         <div className="absolute top-16 right-4 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-10 min-w-[160px]">
           <button
