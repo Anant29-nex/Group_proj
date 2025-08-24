@@ -1,10 +1,12 @@
 'use client'
 import { useEffect, useState } from "react"
 import { db } from "@/lib/firebase"
-import { collection, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore"
+import { collection,query,onSnapshot, updateDoc, deleteDoc, doc } from "firebase/firestore"
 import { Search, Grid3X3, List, Plus } from "lucide-react"
 import ImageCard from "./components/ImageCard"
 import UploadForm from "./components/Uploadform"
+import Footer from "./components/Footer"
+import Navbar from "./components/Navbar"
 
 export default function GalleryPage() {
   const [images, setImages] = useState<any[]>([])
@@ -17,17 +19,20 @@ export default function GalleryPage() {
   const [showUploadForm, setShowUploadForm] = useState(false)
 
 
-  useEffect(() => {
-    const fetchImages = async () => {
-      const querySnapshot = await getDocs(collection(db, "gallery"))
-      const data = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      setImages(data)
-    }
-    fetchImages()
-  }, [])
+
+useEffect(() => {
+  const q = query(collection(db, "gallery"))
+
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setImages(data);
+  });
+
+  return () => unsubscribe(); 
+}, []);
 
   const handleEdit = (image: any) => {
     setEditingImage(image)
@@ -62,13 +67,14 @@ export default function GalleryPage() {
     }
   }
 
-const filteredImages = images.filter((img) =>
-  img.title?.toLowerCase().includes(searchQuery.toLowerCase())
-)
+  const filteredImages = images.filter((img) =>
+    img.title?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar />
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -80,12 +86,12 @@ const filteredImages = images.filter((img) =>
             </div>
 
             <button
-  onClick={() => setShowUploadForm(!showUploadForm)}
-  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg flex items-center space-x-2 shadow-md transition"
->
-  <Plus className="h-5 w-5" />
-  <span>Upload Images</span>
-</button>
+              onClick={() => setShowUploadForm(!showUploadForm)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg flex items-center space-x-2 shadow-md transition"
+            >
+              <Plus className="h-5 w-5" />
+              <span>Upload Images</span>
+            </button>
 
           </div>
         </div>
@@ -94,7 +100,8 @@ const filteredImages = images.filter((img) =>
       {showUploadForm && (
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <UploadForm />
+           <UploadForm onSuccess={() => setShowUploadForm(false)} onCancel={()=>setShowUploadForm(false)} />
+
           </div>
         </div>
       )}
@@ -113,26 +120,24 @@ const filteredImages = images.filter((img) =>
               />
             </div>
 
-           
+
 
             <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-md transition-colors duration-200 ${
-                  viewMode === "grid"
-                    ? "bg-white text-blue-600 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
+                className={`p-2 rounded-md transition-colors duration-200 ${viewMode === "grid"
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 <Grid3X3 className="h-5 w-5" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded-md transition-colors duration-200 ${
-                  viewMode === "list"
-                    ? "bg-white text-blue-600 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
+                className={`p-2 rounded-md transition-colors duration-200 ${viewMode === "list"
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 <List className="h-5 w-5" />
               </button>
@@ -207,6 +212,7 @@ const filteredImages = images.filter((img) =>
           </div>
         </div>
       )}
+      <Footer />
     </div>
   )
 }
