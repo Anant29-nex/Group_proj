@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import { db } from "../lib/firebase";
+import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 
@@ -22,7 +22,7 @@ export default function UploadForm() {
             formData.append("file", file);
             formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
 
-            const res = await axios.post(https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload,
+            const res = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
                 formData
             );
 
@@ -54,9 +54,9 @@ export default function UploadForm() {
     return (
 
 
-        <div className="max-w-lg mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-4">Upload Image</h1>
-            <form onSubmit={handleUpload} className="space-y-4">
+        <div className="max-w-lg mx-auto p-6 border-2 rounded-2xl">
+            <h1 className="text-2xl font-bold mb-4 text-black">Upload Image</h1>
+            <form onSubmit={handleUpload} className="space-y-4 text-gray-900">
                 <input
                     type="text"
                     placeholder="Title"
@@ -82,13 +82,14 @@ export default function UploadForm() {
                         if (file) setFile(file);
                     }}
                     required
+                    className="cursor"
                 />
 
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded "
                 >
                     {loading ? "Uploading..." : "Upload"}
                 </button>
