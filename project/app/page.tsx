@@ -1,218 +1,292 @@
-'use client'
-import { useEffect, useState } from "react"
-import { db } from "@/lib/firebase"
-import { collection,query,onSnapshot, updateDoc, deleteDoc, doc } from "firebase/firestore"
-import { Search, Grid3X3, List, Plus } from "lucide-react"
-import ImageCard from "./components/ImageCard"
-import UploadForm from "./components/Uploadform"
-import Footer from "./components/Footer"
-import Navbar from "./components/Navbar"
+import Link from 'next/link'
+import { Camera, Upload, Shield, Zap, Users, Star, ArrowRight, Play } from 'lucide-react'
+import ImageCard from './components/ImageCard'
+import UploadForm from './components/Uploadform'
 
-export default function GalleryPage() {
-  const [images, setImages] = useState<any[]>([])
-  const [editingImage, setEditingImage] = useState<any | null>(null)
-  const [newTitle, setNewTitle] = useState("")
-  const [newDescription, setNewDescription] = useState("")
+interface SampleImage {
+  id: number
+  url: string
+  title: string
+  description: string
+  uploadDate: string
+  fileSize: string
 
-  const [viewMode, setViewMode] = useState("grid")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [showUploadForm, setShowUploadForm] = useState(false)
+}
 
+export default function HomePage() {
+  // Sample images for the gallery preview
+  const sampleImages: SampleImage[] = [
+    {
+      id: 1,
+      url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop',
+      title: 'Mountain Landscape',
+      description: 'Beautiful mountain view at sunset',
+      uploadDate: '2 days ago',
+      fileSize: '2.4 MB',
+    },
+    {
+      id: 2,
+      url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop',
+      title: 'Forest Path',
+      description: 'Peaceful forest trail in autumn',
+      uploadDate: '1 week ago',
+      fileSize: '1.8 MB',
 
-
-useEffect(() => {
-  const q = query(collection(db, "gallery"))
-
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    const data = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    setImages(data);
-  });
-
-  return () => unsubscribe(); 
-}, []);
-
-  const handleEdit = (image: any) => {
-    setEditingImage(image)
-    setNewTitle(image.title)
-    setNewDescription(image.description)
-  }
-
-  const handleSave = async () => {
-    if (!editingImage) return
-
-    await updateDoc(doc(db, "gallery", editingImage.id), {
-      title: newTitle,
-      description: newDescription,
-    })
-
-    setImages((prevImages) =>
-      prevImages.map((img) =>
-        img.id === editingImage.id
-          ? { ...img, title: newTitle, description: newDescription }
-          : img
-      )
-    )
-
-    setEditingImage(null)
-    alert("Updated successfully!")
-  }
-
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this image?")) {
-      await deleteDoc(doc(db, "gallery", id))
-      setImages((prev) => prev.filter((img) => img.id !== id))
+    },
+    {
+      id: 3,
+      url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop',
+      title: 'Ocean Waves',
+      description: 'Crashing waves on rocky shore',
+      uploadDate: '3 days ago',
+      fileSize: '3.1 MB'
     }
-  }
-
-  const filteredImages = images.filter((img) =>
-    img.title?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-
+  ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Gallery</h1>
-              <p className="text-gray-600 mt-1">
-                {filteredImages.length} of {images.length} images
+    <div className="min-h-screen">
+
+      <div className="min-h-screen bg-gray-900">
+        {/* Hero Section */}
+        <section className="relative bg-gradient-to-br from-black to-primary-400 text-white overflow-hidden min-h-screen flex items-center justify-center py-16">
+          {/* Photo Collage Background */}
+          <div className="absolute inset-0 z-0">
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-4 p-8 opacity-100">
+              {/* These divs represent abstract "photo cards" */}
+              <div className="col-span-2 row-span-2 w-full h-48 bg-white/5 rounded-xl transform rotate-3 "></div>
+              <div className="col-span-3 h-32 bg-white/5 rounded-xl transform -rotate-2 backdrop-blur-sm"></div>
+              <div className="col-span-1 h-24 bg-white/5 rounded-xl transform rotate-6 backdrop-blur-sm"></div>
+              <div className="col-span-2 h-40 bg-white/5 rounded-xl transform rotate-4 backdrop-blur-sm"></div>
+              <div className="col-span-2 h-36 bg-white/5 rounded-xl transform -rotate-1 backdrop-blur-sm"></div>
+              <div className="col-span-3 h-52 bg-white/5 rounded-xl transform rotate-2 backdrop-blur-sm"></div>
+              <div className="col-span-2 h-32 bg-white/5 rounded-xl transform -rotate-3 backdrop-blur-sm"></div>
+            </div>
+          </div>
+
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 text-center z-10">
+            <div className="inline-flex items-center space-x-2 border border-white/20 bg-white/10 backdrop-blur-sm rounded-full px-6 py-2 mb-8 transition-all duration-300 hover:scale-105">
+              <Camera className="h-5 w-5 text-white" />
+              <span className="text-sm font-medium text-white">ImageVault Pro</span>
+            </div>
+
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight font-family: var(--font-sans) ">
+              Your Photos,
+              <span className="block text-purple-50 font-family: var(--font-sans) font-style: italic">Beautifully Organized</span>
+            </h1>
+
+            <p className="text-xl md:text-2xl text-purple-200 mb-12 max-w-3xl mx-auto leading-relaxed">
+              Upload, organize, and share your precious memories with ImageVault.
+              A modern, secure platform designed for photographers and memory keepers.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              <Link href="/signup" className="bg-white text-blue-900 hover:bg-gray-100 font-semibold py-4 px-8 rounded-xl text-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center">
+                Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+              <Link href="/gallery" className="border-2 border-white/30 text-white hover:bg-white/10 font-semibold py-4 px-8 rounded-xl text-lg transition-all duration-200 backdrop-blur-sm flex items-center justify-center">
+                View Gallery
+              </Link>
+            </div>
+          </div>
+        </section>
+      </div>
+
+
+
+      {/* Features Section */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-blue-900 mb-4">
+              Why Choose ImageVault?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Built with modern technology and user experience in mind
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="text-center group">
+              <div className="bg-primary-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary-200 transition-colors duration-300">
+                <Camera className="w-10 h-10 text-blue-900" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">High Quality</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Upload images in full resolution with zero compression. Your memories stay crystal clear.
               </p>
             </div>
 
-            <button
-              onClick={() => setShowUploadForm(!showUploadForm)}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg flex items-center space-x-2 shadow-md transition"
-            >
-              <Plus className="h-5 w-5" />
-              <span>Upload Images</span>
-            </button>
-
-          </div>
-        </div>
-      </div>
-
-      {showUploadForm && (
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-           <UploadForm onSuccess={() => setShowUploadForm(false)} onCancel={()=>setShowUploadForm(false)} />
-
-          </div>
-        </div>
-      )}
-
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search images..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
+            <div className="text-center group">
+              <div className="bg-primary-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary-200 transition-colors duration-300">
+                <Upload className="w-10 h-10 text-blue-900" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">Easy Upload</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Drag and drop or click to upload. Support for bulk uploads and multiple formats.
+              </p>
             </div>
 
+            <div className="text-center group">
+              <div className="bg-primary-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary-200 transition-colors duration-300">
+                <Shield className="w-10 h-10 text-blue-900" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">Secure Storage</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Enterprise-grade security with end-to-end encryption. Your photos are safe with us.
+              </p>
+            </div>
 
-
-            <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-md transition-colors duration-200 ${viewMode === "grid"
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-                  }`}
-              >
-                <Grid3X3 className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`p-2 rounded-md transition-colors duration-200 ${viewMode === "list"
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-                  }`}
-              >
-                <List className="h-5 w-5" />
-              </button>
+            <div className="text-center group">
+              <div className="bg-primary-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary-200 transition-colors duration-300">
+                <Zap className="w-10 h-10 text-blue-900" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">Lightning Fast</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Optimized for speed with CDN distribution. Load your gallery in milliseconds.
+              </p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {filteredImages.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <Search className="h-16 w-16 mx-auto" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No images found</h3>
-            <p className="text-gray-600">Try adjusting your search or filter criteria</p>
+      {/* Gallery Preview Section */}
+      <section className="py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-blue-900 mb-4">
+              Beautiful Gallery Experience
+            </h2>
+            <p className="text-xl text-blue-400 max-w-2xl mx-auto">
+              See how your images will look in our modern, responsive gallery
+            </p>
           </div>
-        ) : (
-          <div
-            className={
-              viewMode === "grid"
-                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                : "space-y-4"
-            }
-          >
-            {filteredImages.map((item) => (
-              <ImageCard
-                key={item.id}
-                image={item}
-                onEdit={() => handleEdit(item)}
-                onDelete={() => handleDelete(item.id)}
-              />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {sampleImages.map((image) => (
+              <ImageCard key={image.id} image={image} />
             ))}
           </div>
-        )}
-      </div>
 
-      {editingImage && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4 text-black">Edit Image</h2>
+          <div className="text-center">
+            <Link href="/gallery" className="inline-flex items-center space-x-2 bg-blue-900 hover:bg-primary-700 text-white font-semibold py-4 px-8 rounded-xl text-lg transition-colors duration-200">
+              <span>Explore Full Gallery</span>
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
 
-            <label className="block mb-2 text-sm font-medium text-gray-700">Title</label>
-            <input
-              type="text"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              className="w-full border rounded p-2 mb-4 text-gray-800"
-            />
+      {/* Upload Demo Section */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-blue-900 mb-4">
+              Simple Upload Process
+            </h2>
+            <p className="text-xl text-blue-400 max-w-2xl mx-auto">
+              Try our intuitive upload interface with drag and drop functionality
+            </p>
+          </div>
 
-            <label className="block mb-2 text-sm font-medium text-gray-700">Description</label>
-            <textarea
-              value={newDescription}
-              onChange={(e) => setNewDescription(e.target.value)}
-              className="w-full border rounded p-2 mb-4 text-gray-800"
-            />
+          <UploadForm />
+        </div>
+      </section>
 
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setEditingImage(null)}
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-black"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
-              >
-                Save
-              </button>
+      {/* Testimonials Section */}
+      <section className="py-24 bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">
+              Loved by Photographers Worldwide
+            </h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              See what our community has to say about ImageVault
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-gray-800 p-8 rounded-2xl">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                "ImageVault has completely transformed how I organize my photography business. The interface is intuitive and the upload speeds are incredible."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center mr-4">
+                  <Users className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="font-semibold">Sarah Johnson</div>
+                  <div className="text-gray-400 text-sm">Professional Photographer</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-800 p-8 rounded-2xl">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                "The security features give me peace of mind knowing my client photos are safe. Plus, the sharing options are perfect for collaboration."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center mr-4">
+                  <Users className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="font-semibold">Mike Chen</div>
+                  <div className="text-gray-400 text-sm">Wedding Photographer</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-800 p-8 rounded-2xl">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                "As a travel blogger, I need to manage thousands of photos. ImageVault makes it effortless to organize and showcase my work."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center mr-4">
+                  <Users className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="font-semibold">Emma Rodriguez</div>
+                  <div className="text-gray-400 text-sm">Travel Blogger</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      )}
-      <Footer />
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-50 bg-gradient-to-br from-primary-800 to-primary-200">
+        <div className="max-w-4xl mx-auto text-center px-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Ready to organize your memories?
+          </h2>
+          <p className="text-xl text-primary-100 mb-8 leading-relaxed">
+            Join thousands of photographers and memory keepers who trust ImageVault with their precious photos.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/signup" className="bg-white text-blue-900 hover:bg-gray-100 font-semibold py-4 px-8 rounded-xl text-lg transition-all duration-200 transform hover:scale-105 shadow-lg">
+              Start Your Gallery Today
+            </Link>
+            <Link href="/gallery" className="border-2 border-white/30 text-white hover:bg-white/10 font-semibold py-4 px-8 rounded-xl text-lg transition-all duration-200 backdrop-blur-sm">
+              Take a Tour
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
