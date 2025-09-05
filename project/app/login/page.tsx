@@ -3,10 +3,12 @@ import { useState, useEffect } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
+import {Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -14,7 +16,7 @@ export default function LoginPage() {
   const { user } = useAuth();
   const auth = getAuth();
 
-  // ✅ Redirect if logged in
+  // ✅ Redirect if already logged in
   useEffect(() => {
     if (user) {
       router.push("/gallery");
@@ -30,7 +32,22 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/gallery");
     } catch (err: any) {
-      setError(err.message);
+      switch (err.code) {
+        case "auth/invalid-email":
+          setError("Invalid email format.");
+          break;
+        case "auth/user-not-found":
+          setError("No account found with this email.");
+          break;
+        case "auth/wrong-password":
+          setError("Incorrect password. Please try again.");
+          break;
+        case "auth/too-many-requests":
+          setError("Too many failed attempts. Try again later.");
+          break;
+        default:
+          setError("Failed to login. Please check your credentials.");
+      }
     } finally {
       setLoading(false);
     }
@@ -54,14 +71,30 @@ export default function LoginPage() {
             required
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-          />
+
+          {/* Password with show/hide */}
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? (
+                <Eye className="h-5 w-5" />
+              ) : (
+                <EyeOff className="h-5 w-5" />
+              )}
+            </button>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
