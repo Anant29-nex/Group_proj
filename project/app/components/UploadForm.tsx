@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import { db } from "lib/firebase";
+import { db } from "../../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Upload, X } from "lucide-react";
+import { getAuth } from "firebase/auth";
 
 export default function UploadForm({
   onSuccess,
@@ -20,6 +21,13 @@ export default function UploadForm({
   const handleUpload = async (e: any) => {
     e.preventDefault();
     if (!file) return alert("Please select an image!");
+
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) {
+      alert("You must be logged in to upload!");
+      return;
+    }
 
     setLoading(true);
 
@@ -47,6 +55,7 @@ export default function UploadForm({
         fileSizeInMB,
         uploadedDate,
         createdAt: serverTimestamp(),
+        userId: user.uid, 
       });
 
       alert("Uploaded successfully!");
@@ -63,24 +72,24 @@ export default function UploadForm({
       setLoading(false);
     }
   };
-
   return (
-    <div className="width-full mx-auto p-6 border-2 rounded-2xl bg-white shadow mb-15">
+    <div className="max-w-lg mx-auto p-6 border-2 rounded-2xl bg-white shadow">
       <h1 className="text-2xl font-bold mb-4 text-blue-900 mb-10">Upload Image</h1>
       <form onSubmit={handleUpload} className="space-y-4 text-gray-900">
-        <label className="text-xl text-blue-900 mb-5">Title</label> 
+         <label className="text-xl text-blue-900 mb-5">Title</label> 
         <input
           type="text"
-          placeholder="Suitable Title"
-          className="w-full border p-2 rounded mb-10"
+          placeholder="Title"
+          className="w-full border p-2 rounded"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
         />
-<label className="text-xl text-blue-900 mb-5">Description</label> 
+
+        <label className="text-xl text-blue-900 mb-5">Description</label> 
         <textarea
           placeholder="Description"
-          className="w-full border p-2 rounded mb-10"
+          className="w-full border p-2 rounded"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
@@ -102,8 +111,8 @@ export default function UploadForm({
             htmlFor="fileUpload"
             className="flex flex-col items-center justify-center cursor-pointer"
           >
-            <Upload className="h-10 w-10 text-blue-900 mb-2" />
-            <span className="text-blue-600 hover:underline">
+            <Upload className="h-10 w-10 text-gray-400 mb-2" />
+            <span className="text-blue-900 hover:underline">
               {file ? file.name : "Click to choose file or drag & drop"}
             </span>
           </label>

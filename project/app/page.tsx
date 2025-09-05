@@ -6,6 +6,8 @@ import UploadForm from './components/UploadForm'
 import { useEffect, useState } from "react";
 import { db } from "lib/firebase";
 import { collection, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import { useAuth } from "./context/AuthContext";
+import { query, where } from "firebase/firestore";
 
 interface SampleImage {
   id: number
@@ -53,16 +55,28 @@ export default function HomePage() {
   //   }
   // ]
 
+ const { user } = useAuth(); // Get current user from AuthContext
   const [images, setImages] = useState<any[]>([]);
 
-useEffect(() => {
-  const fetchImages = async () => {
-    const querySnapshot = await getDocs(collection(db, "gallery"));
-    const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    setImages(data);
-  };
-  fetchImages();
-}, []);
+  useEffect(() => {
+    const fetchImages = async () => {
+      let q;
+      if (user) {
+        // Only fetch images uploaded by the logged-in user
+        q = query(collection(db, "gallery"), where("userId", "==", user.uid));
+      } else {
+        // Fetch all images (default)
+        q = collection(db, "gallery");
+      }
+      const querySnapshot = await getDocs(q);
+      const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setImages(data);
+    };
+    fetchImages();
+  }, [user]); // Refetch when user changes
+
+
+
 
   return (
     <div className="min-h-screen">
@@ -87,7 +101,7 @@ useEffect(() => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 text-center z-10">
           <div className="inline-flex items-center space-x-2 border border-white/20 bg-white/10 backdrop-blur-sm rounded-full px-6 py-2 mb-8 transition-all duration-300 hover:scale-105">
             <Camera className="h-5 w-5 text-white" />
-            <span className="text-sm font-medium text-white">ImageVault Pro</span>
+            <span className="text-sm font-medium text-white">ImageVault</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight font-family: var(--font-sans) ">
