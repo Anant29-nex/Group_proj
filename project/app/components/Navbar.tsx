@@ -1,21 +1,14 @@
-'use client'
-import { useState } from 'react'
-import Link from 'next/link'
-import { Menu, X, Camera, User, LogOut } from 'lucide-react'
-
-interface User {
-  id: string
-  name: string
-  email: string
-  avatar: string | null
-}
+"use client"
+import { useState } from "react"
+import Link from "next/link"
+import { Menu, X, Camera, User } from "lucide-react"
+import { useAuth } from "../context/AuthContext"   // ⬅️ import AuthContext
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState<boolean>(false)
-  
-  // Mock user state - replace with actual auth context
-  const [user] = useState<User | null>(null)
+
+  const { user, logout } = useAuth()   // ⬅️ get user + logout from context
 
   const toggleMenu = (): void => setIsMenuOpen(!isMenuOpen)
   const toggleUserMenu = (): void => setIsUserMenuOpen(!isUserMenuOpen)
@@ -32,7 +25,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className=" text-gray-700 text-lg weight-20px hover:text-primary-600 hover:underline transition-colors">
+            <Link href="/" className="text-gray-700 text-lg hover:text-primary-600 hover:underline transition-colors">
               Home
             </Link>
             <Link href="/gallery" className="text-gray-700 text-lg hover:text-primary-600 hover:underline transition-colors">
@@ -55,18 +48,15 @@ export default function Navbar() {
                   className="flex items-center space-x-2 text-gray-700 hover:text-primary-600 transition-colors"
                 >
                   <User className="h-5 w-5" />
-                  <span>{user.name}</span>
+                  <span>{user.email}</span>
                 </button>
-                
+
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                    <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      Profile
-                    </Link>
-                    <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      Settings
-                    </Link>
-                    <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <button
+                      onClick={logout}   
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
                       Sign Out
                     </button>
                   </div>
@@ -77,7 +67,10 @@ export default function Navbar() {
                 <Link href="/login" className="text-gray-700 hover:text-blue-900 hover:underline transition-colors">
                   Sign In
                 </Link>
-                <Link href="/signup" className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg flex items-center space-x-2">
+                <Link
+                  href="/signup"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg flex items-center space-x-2"
+                >
                   Get Started
                 </Link>
               </>
@@ -111,13 +104,16 @@ export default function Navbar() {
               <Link href="/contact" className="block px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors">
                 Contact
               </Link>
-              
+
               {user ? (
                 <>
                   <Link href="/profile" className="block px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors">
                     Profile
                   </Link>
-                  <button className="block w-full text-left px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors">
+                  <button
+                    onClick={logout}
+                    className="block w-full text-left px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                  >
                     Sign Out
                   </button>
                 </>

@@ -1,7 +1,15 @@
 'use client'
 import { useEffect, useState } from "react"
 import { db } from "@/lib/firebase"
-import { collection, query, where, onSnapshot, updateDoc, deleteDoc, doc } from "firebase/firestore"
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { Search, Grid3X3, List, Plus } from "lucide-react"
 import ImageCard from "../components/ImageCard"
@@ -22,7 +30,6 @@ export default function GalleryPage() {
   useEffect(() => {
     const auth = getAuth()
 
-    // Track logged-in user
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser)
 
@@ -125,13 +132,21 @@ export default function GalleryPage() {
           <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-md ${viewMode === "grid" ? "bg-white text-blue-600" : "text-gray-500"}`}
+              className={`p-2 rounded-md ${
+                viewMode === "grid"
+                  ? "bg-white text-blue-600"
+                  : "text-gray-500"
+              }`}
             >
               <Grid3X3 className="h-5 w-5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2 rounded-md ${viewMode === "list" ? "bg-white text-blue-600" : "text-gray-500"}`}
+              className={`p-2 rounded-md ${
+                viewMode === "list"
+                  ? "bg-white text-blue-600"
+                  : "text-gray-500"
+              }`}
             >
               <List className="h-5 w-5" />
             </button>
@@ -162,6 +177,48 @@ export default function GalleryPage() {
           </div>
         )}
       </div>
+
+      {editingImage && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md transform transition-all scale-100 animate-fadeIn">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
+        ✏️ Edit Image
+      </h2>
+
+      <div className="space-y-4">
+        <input
+          type="text"
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+          placeholder="Title"
+        />
+        <textarea
+          value={newDescription}
+          onChange={(e) => setNewDescription(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none h-28"
+          placeholder="Description"
+        />
+      </div>
+
+      <div className="flex justify-end gap-3 mt-6">
+        <button
+          onClick={() => setEditingImage(null)}
+          className="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium shadow-sm hover:bg-gray-300 transition"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSave}
+          className="px-5 py-2 rounded-lg bg-blue-600 text-white font-medium shadow-md hover:bg-blue-700 transition"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       <Footer />
     </div>
