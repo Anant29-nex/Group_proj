@@ -4,6 +4,7 @@ import axios from "axios";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Upload, X } from "lucide-react";
+import { getAuth } from "firebase/auth";
 
 export default function UploadForm({
   onSuccess,
@@ -20,6 +21,13 @@ export default function UploadForm({
   const handleUpload = async (e: any) => {
     e.preventDefault();
     if (!file) return alert("Please select an image!");
+
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) {
+      alert("You must be logged in to upload!");
+      return;
+    }
 
     setLoading(true);
 
@@ -47,6 +55,7 @@ export default function UploadForm({
         fileSizeInMB,
         uploadedDate,
         createdAt: serverTimestamp(),
+        userId: user.uid, 
       });
 
       alert("Uploaded successfully!");
@@ -63,7 +72,6 @@ export default function UploadForm({
       setLoading(false);
     }
   };
-
   return (
     <div className="max-w-lg mx-auto p-6 border-2 rounded-2xl bg-white shadow">
       <h1 className="text-2xl font-bold mb-4 text-black">Upload Image</h1>
