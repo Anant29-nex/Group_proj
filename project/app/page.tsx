@@ -1,7 +1,11 @@
+'use client'
 import Link from 'next/link'
 import { Camera, Upload, Shield, Zap, Users, Star, ArrowRight, Play } from 'lucide-react'
 import ImageCard from './components/ImageCard'
 import UploadForm from './components/UploadForm'
+import { useEffect, useState } from "react";
+import { db } from "lib/firebase";
+import { collection, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
 
 interface SampleImage {
   id: number
@@ -15,39 +19,50 @@ interface SampleImage {
 }
 
 export default function HomePage() {
-  // Sample images for the gallery preview
-  const sampleImages: SampleImage[] = [
-    {
-      id: 1,
-      url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop',
-      title: 'Mountain Landscape',
-      description: 'Beautiful mountain view at sunset',
-      uploadDate: '2 days ago',
-      fileSize: '2.4 MB',
-      tags: ['nature', 'landscape', 'mountains'],
-      isLiked: false
-    },
-    {
-      id: 2,
-      url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop',
-      title: 'Forest Path',
-      description: 'Peaceful forest trail in autumn',
-      uploadDate: '1 week ago',
-      fileSize: '1.8 MB',
-      tags: ['nature', 'forest', 'autumn'],
-      isLiked: true
-    },
-    {
-      id: 3,
-      url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop',
-      title: 'Ocean Waves',
-      description: 'Crashing waves on rocky shore',
-      uploadDate: '3 days ago',
-      fileSize: '3.1 MB',
-      tags: ['ocean', 'waves', 'nature'],
-      isLiked: false
-    }
-  ]
+  // // Sample images for the gallery preview
+  // const sampleImages: SampleImage[] = [
+  //   {
+  //     id: 1,
+  //     url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop',
+  //     title: 'Mountain Landscape',
+  //     description: 'Beautiful mountain view at sunset',
+  //     uploadDate: '2 days ago',
+  //     fileSize: '2.4 MB',
+  //     tags: ['nature', 'landscape', 'mountains'],
+  //     isLiked: false
+  //   },
+  //   {
+  //     id: 2,
+  //     url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop',
+  //     title: 'Forest Path',
+  //     description: 'Peaceful forest trail in autumn',
+  //     uploadDate: '1 week ago',
+  //     fileSize: '1.8 MB',
+  //     tags: ['nature', 'forest', 'autumn'],
+  //     isLiked: true
+  //   },
+  //   {
+  //     id: 3,
+  //     url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop',
+  //     title: 'Ocean Waves',
+  //     description: 'Crashing waves on rocky shore',
+  //     uploadDate: '3 days ago',
+  //     fileSize: '3.1 MB',
+  //     tags: ['ocean', 'waves', 'nature'],
+  //     isLiked: false
+  //   }
+  // ]
+
+  const [images, setImages] = useState<any[]>([]);
+
+useEffect(() => {
+  const fetchImages = async () => {
+    const querySnapshot = await getDocs(collection(db, "gallery"));
+    const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    setImages(data);
+  };
+  fetchImages();
+}, []);
 
   return (
     <div className="min-h-screen">
@@ -80,14 +95,14 @@ export default function HomePage() {
             <span className="block text-purple-50 font-family: var(--font-sans) font-style: italic">Beautifully Organized</span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-purple-200 mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-white mb-12 max-w-3xl mx-auto leading-relaxed">
             Upload, organize, and share your precious memories with ImageVault. 
             A modern, secure platform designed for photographers and memory keepers.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link href="/signup" className="bg-white text-blue-900 hover:bg-gray-100 font-semibold py-4 px-8 rounded-xl text-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center">
-              Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
+              Get Started  <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
             <Link href="/gallery" className="border-2 border-white/30 text-white hover:bg-white/10 font-semibold py-4 px-8 rounded-xl text-lg transition-all duration-200 backdrop-blur-sm flex items-center justify-center">
               View Gallery
@@ -171,35 +186,39 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+{/* Gallery Preview Section */}
+<section className="py-24 bg-gray-50">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-16">
+      <h2 className="text-4xl font-bold text-blue-900 mb-4">
+        Beautiful Gallery Experience
+      </h2>
+      <p className="text-xl text-blue-400 max-w-2xl mx-auto">
+        See how your images will look in our modern, responsive gallery
+      </p>
+    </div>
 
-      {/* Gallery Preview Section */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-blue-900 mb-4">
-              Beautiful Gallery Experience
-            </h2>
-            <p className="text-xl text-blue-400 max-w-2xl mx-auto">
-              See how your images will look in our modern, responsive gallery
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {sampleImages.map((image) => (
-              <ImageCard key={image.id} image={image} />
-            ))}
-          </div>
-          
-          <div className="text-center">
-            <Link href="/gallery" className="inline-flex items-center space-x-2 bg-blue-900 hover:bg-primary-700 text-white font-semibold py-4 px-8 rounded-xl text-lg transition-colors duration-200">
-              <span>Explore Full Gallery</span>
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
+    {/* ✅ Dynamic Images */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+      {images.slice(0, 3).map((image) => (
+        <ImageCard key={image.id} image={image} />
+      ))}
+    </div>
 
-      {/* Upload Demo Section */}
+    <div className="text-center">
+      <Link
+        href="/gallery"
+        className="inline-flex items-center space-x-2 bg-blue-900 hover:bg-primary-700 text-white font-semibold py-4 px-8 rounded-xl text-lg transition-colors duration-200"
+      >
+        <span>Explore Full Gallery</span>
+        <ArrowRight className="h-5 w-5" />
+      </Link>
+    </div>
+  </div>
+</section>
+
+
+      {/* Upload Demo Section
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -213,7 +232,7 @@ export default function HomePage() {
           
           <UploadForm />
         </div>
-      </section>
+      </section> */}
 
       {/* Testimonials Section */}
       <section className="py-24 bg-gray-900 text-white">
