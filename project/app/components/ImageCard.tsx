@@ -14,13 +14,14 @@ export default function ImageCard({ image, onEdit, onDelete ,isFavorited, onTogg
 
   return (
     <div className="group relative bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-      <div className="relative aspect-square overflow-hidden">
-        
+      <div className="relative aspect-square overflow-hidden"
+            onClick={handleImageClick}>
         <img
           src={image?.imageUrl || '/placeholder-image.jpg'}
           alt={image?.title || 'Image'}
+          
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 cursor-pointer"
-           onClick={handleImageClick}
+       
         />
        
 

@@ -28,12 +28,7 @@ export default function ImageDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12">
-      <button
-        onClick={() => router.back()}
-        className="mb-6 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-gray-700"
-      >
-        ← Back to Gallery
-      </button>
+      
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-2xl w-full">
         <img
           src={image.imageUrl}
@@ -47,6 +42,12 @@ export default function ImageDetailPage() {
           <span>Size: {image.fileSizeInMB || "?"} MB</span>
         </div>
       </div>
+      <button
+        onClick={() => router.back()}
+        className="mt-15 mb-6 px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-600 text-gray-700"
+      >
+        Back to Gallery
+      </button>
     </div>
   );
 }
