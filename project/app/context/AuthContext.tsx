@@ -1,92 +1,51 @@
-'use client'
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-
-interface User {
-  id: string
-  name: string
-  email: string
-  avatar: string | null
-}
+"use client";
+import { createContext, useContext, useEffect, useState } from "react";
+import { User, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "firebase/auth";
+import { auth } from "../../lib/firebase"; 
 
 interface AuthContextType {
-  user: User | null
-  loading: boolean
-  login: (email: string, password: string) => Promise<User>
-  signup: (name: string, email: string, password: string) => Promise<User>
-  logout: () => void
+  user: User | null;
+  loading: boolean;
+  signup: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export function useAuth(): AuthContextType {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-  return context
-}
-
-interface AuthProviderProps {
-  children: ReactNode
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in (e.g., check localStorage, cookies, etc.)
-    const checkAuth = (): void => {
-      // For now, we'll just set loading to false
-      // In a real app, you'd check for existing auth tokens
-      setLoading(false)
-    }
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
-    checkAuth()
-  }, [])
+  const signup = async (email: string, password: string) => {
+    await createUserWithEmailAndPassword(auth, email, password);
+  };
 
-  const login = async (email: string, password: string): Promise<User> => {
-    // Implement login logic here
-    // For now, just simulate a successful login
-    const mockUser: User = {
-      id: '1',
-      name: 'John Doe',
-      email: email,
-      avatar: null
-    }
-    setUser(mockUser)
-    return mockUser
-  }
+  const login = async (email: string, password: string) => {
+    await signInWithEmailAndPassword(auth, email, password);
+  };
 
-  const signup = async (name: string, email: string, password: string): Promise<User> => {
-    // Implement signup logic here
-    // For now, just simulate a successful signup
-    const mockUser: User = {
-      id: '1',
-      name: name,
-      email: email,
-      avatar: null
-    }
-    setUser(mockUser)
-    return mockUser
-  }
-
-  const logout = (): void => {
-    setUser(null)
-    // Clear any stored auth tokens
-  }
-
-  const value: AuthContextType = {
-    user,
-    loading,
-    login,
-    signup,
-    logout
-  }
+  const logout = async () => {
+    await signOut(auth);
+  };
 
   return (
-    <AuthContext.Provider value={value}>
-      {children}
+    <AuthContext.Provider value={{ user, loading, signup, login, logout }}>
+      {!loading && children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
+};

@@ -9,7 +9,6 @@ interface AuthFormProps {
 }
 
 interface FormData {
-  name: string
   email: string
   password: string
   confirmPassword: string
@@ -17,7 +16,6 @@ interface FormData {
 
 export default function AuthForm({ type }: AuthFormProps) {
   const [formData, setFormData] = useState<FormData>({
-    name: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -26,7 +24,7 @@ export default function AuthForm({ type }: AuthFormProps) {
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
-  
+
   const { login, signup } = useAuth()
   const router = useRouter()
 
@@ -53,11 +51,11 @@ export default function AuthForm({ type }: AuthFormProps) {
         if (formData.password.length < 6) {
           throw new Error('Password must be at least 6 characters long')
         }
-        await signup(formData.name, formData.email, formData.password)
+        await signup(formData.email, formData.password)
       } else {
         await login(formData.email, formData.password)
       }
-      
+
       router.push('/gallery')
     } catch (err: any) {
       setError(err.message || 'An error occurred. Please try again.')
@@ -71,24 +69,6 @@ export default function AuthForm({ type }: AuthFormProps) {
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
           {error}
-        </div>
-      )}
-
-      {isSignup && (
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-            Full Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="input-field"
-            placeholder="Enter your full name"
-          />
         </div>
       )}
 
