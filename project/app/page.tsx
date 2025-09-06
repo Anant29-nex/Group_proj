@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Camera, Upload, Shield, Zap, Users, Star, ArrowRight, Play } from 'lucide-react'
 import ImageCard from './components/ImageCard'
 import UploadForm from './components/Uploadform'
+import Navbar from './components/Navbar'
 
 interface SampleImage {
   id: number
@@ -14,7 +15,6 @@ interface SampleImage {
 }
 
 export default function HomePage() {
-  // Sample images for the gallery preview
   const sampleImages: SampleImage[] = [
     {
       id: 1,
@@ -45,14 +45,12 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
+      <Navbar/>
 
       <div className="min-h-screen bg-gray-900">
-        {/* Hero Section */}
         <section className="relative bg-gradient-to-br from-black to-primary-400 text-white overflow-hidden min-h-screen flex items-center justify-center py-16">
-          {/* Photo Collage Background */}
           <div className="absolute inset-0 z-0">
             <div className="grid grid-cols-4 md:grid-cols-8 gap-4 p-8 opacity-100">
-              {/* These divs represent abstract "photo cards" */}
               <div className="col-span-2 row-span-2 w-full h-48 bg-white/5 rounded-xl transform rotate-3 "></div>
               <div className="col-span-3 h-32 bg-white/5 rounded-xl transform -rotate-2 backdrop-blur-sm"></div>
               <div className="col-span-1 h-24 bg-white/5 rounded-xl transform rotate-6 backdrop-blur-sm"></div>
@@ -174,7 +172,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Upload Demo Section */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -190,7 +187,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
       <section className="py-24 bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -266,7 +262,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-50 bg-gradient-to-br from-primary-800 to-primary-200">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
