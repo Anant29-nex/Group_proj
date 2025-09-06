@@ -1,11 +1,8 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-<<<<<<< HEAD
-import { db } from "@/lib/firebase";
-=======
+
 import { db } from "../../lib/firebase";
->>>>>>> 9479df7829897ca99595e12ae251705d58994c09
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Upload, X } from "lucide-react";
 import { getAuth } from "firebase/auth";
@@ -43,16 +40,10 @@ export default function UploadForm({
         process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!
       );
 
-<<<<<<< HEAD
             const res = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
                 formData
             );
-=======
-      const res = await axios.post(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        formData
-      );
->>>>>>> 9479df7829897ca99595e12ae251705d58994c09
+
 
       const imageUrl = res.data.secure_url;
       const fileSizeInMB = (res.data.bytes / (1024 * 1024)).toFixed(2);
@@ -96,7 +87,6 @@ export default function UploadForm({
           required
         />
 
-<<<<<<< HEAD
         <div className="max-w-lg mx-auto p-6 border-2 rounded-2xl">
             <h1 className="text-2xl font-bold mb-4 text-black">Upload Image</h1>
             <form onSubmit={handleUpload} className="space-y-4 text-gray-900">
@@ -137,7 +127,7 @@ export default function UploadForm({
                     {loading ? "Uploading..." : "Upload"}
                 </button>
             </form>
-=======
+            </div>
         <label className="text-xl text-blue-900 mb-5">Description</label> 
         <textarea
           placeholder="Description"
@@ -168,7 +158,6 @@ export default function UploadForm({
               {file ? file.name : "Click to choose file or drag & drop"}
             </span>
           </label>
->>>>>>> 9479df7829897ca99595e12ae251705d58994c09
         </div>
 
         {/* Buttons */}
