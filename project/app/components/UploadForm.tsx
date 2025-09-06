@@ -153,7 +153,6 @@ export default function UploadForm({
             htmlFor="fileUpload"
             className="flex flex-col items-center justify-center cursor-pointer"
           >
-            <Upload className="h-10 w-10 text-gray-400 mb-2" />
             <span className="text-blue-900 hover:underline">
               {file ? file.name : "Click to choose file or drag & drop"}
             </span>
