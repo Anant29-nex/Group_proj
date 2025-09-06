@@ -86,7 +86,7 @@ export default function UploadForm({
           onChange={(e) => setTitle(e.target.value)}
           required
         />
-
+{/* 
         <div className="max-w-lg mx-auto p-6 border-2 rounded-2xl">
             <h1 className="text-2xl font-bold mb-4 text-black">Upload Image</h1>
             <form onSubmit={handleUpload} className="space-y-4 text-gray-900">
@@ -127,7 +127,7 @@ export default function UploadForm({
                     {loading ? "Uploading..." : "Upload"}
                 </button>
             </form>
-            </div>
+            </div> */}
         <label className="text-xl text-blue-900 mb-5">Description</label> 
         <textarea
           placeholder="Description"
