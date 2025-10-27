@@ -75,7 +75,7 @@ export default function UploadForm({
   };
   return (
     <div className="max-w-lg mx-auto p-6 border-2 rounded-2xl bg-white shadow">
-      <h1 className="text-2xl font-bold mb-4 text-blue-900 mb-10">Upload Image</h1>
+      <h1 className="text-2xl font-bold  text-blue-900 mb-10">Upload Image</h1>
       <form onSubmit={handleUpload} className="space-y-4 text-gray-900">
          <label className="text-xl text-blue-900 mb-5">Title</label> 
         <input
